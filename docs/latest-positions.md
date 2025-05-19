@@ -42,7 +42,7 @@ Si la solicitud es válida y el token de autenticación es correcto, la API resp
     "imei": "123456789012345",
     "latitude": 19.432608,
     "longitude": -99.133209,
-    "speed": 60,
+    "speed": 62,
     "status": "online",
     "timestamp": "2025-05-18T14:45:00Z"
   },
