@@ -2,10 +2,11 @@
 title: Rastreo Vial API Docs
 ---
 
-# Welcome to the Rastreo Vial API
+# Bienvenido a la API de Rastreo Vial
+Favor de leer la siguiente documentación en este orden:
 
 - [Authentication](api-auth.md)
 - [List Devices](list-devices.md)
 - [Latest Positions](latest-positions.md)
 
-_Last updated: 2025-05-19_
+
