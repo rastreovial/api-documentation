@@ -6,7 +6,7 @@
 Este endpoint permite autenticar a un usuario en la plataforma de Rastreo Vial y obtener un token de acceso para futuras solicitudes a la API.
 
 - **URL Base**: `https://gps.rastreovial.com/api/`
-- **Endpoint**: `auth/login`
+- **Endpoint**: `login`
 - **Método HTTP**: `POST`
 - **Autenticación**: No requiere token previo
 
