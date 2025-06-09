@@ -1,124 +1,138 @@
-# Rastreo Vial API – **GET `/get_devices`**
 
-Retrieve a paginated list of devices that belong to the authenticated user.  
-Use the filters below to narrow the results by status, identifiers, group, model, etc.
+# Rastreo Vial API – **GET `/get_devices_latest`**
 
-> **Base URL**   
+Return only the devices whose status or telemetry **changed since your last call**.  
+Every successful response also includes a top-level integer field `time`; use that value (in **seconds**) as the recommended delay before you issue the next polling request.
+
+> **Base URL**  
 > `https://gps.rastreovial.com`
 
 | Method | Endpoint |
 | ------ | -------- |
-| `GET`  | `/get_devices` |
+| `GET`  | `/get_devices_latest` |
 
 ---
 
 ## Query Parameters
 
-| Name | Type | Required | Default | Description |
-| ---- | ---- | -------- | ------- | ----------- |
-| `lang` | `string` | **Yes** | `en` | Response language |
-| `user_api_hash` | `string` | **Yes** | – | Your personal API key (hash) |
-| `device_model` | `string` | No | – | Exact `device_model` match |
-| `group_id` | `string` | No | – | Exact `group_id` match |
-| `id` | `string` | No | – | Exact internal device ID |
-| `imei` | `string` | No | – | Exact device IMEI |
-| `limit` | `integer` | No | `100` | Items per page (max 100) |
-| `msisdn` | `string` | No | – | Exact MSISDN |
-| `object_owner` | `string` | No | – | Exact object owner |
-| `offline` | `string` | No | – | Devices **offline** for at least *N* minutes |
-| `online` | `string` | No | – | Devices **online** for at least *N* minutes |
-| `page` | `integer` | No | `1` | Page number (1-based) |
-| `plate_number` | `string` | No | – | Exact license-plate value |
-| `registration_number` | `string` | No | – | Exact registration number |
-| `s` | `string` | No | – | Full-text search across properties |
-| `sim_number` | `string` | No | – | Exact SIM number |
-| `status` | `array[string]` (CSV) | No | – | One or more status values (comma separated) |
-| `vin` | `string` | No | – | Exact VIN |
+### Required
+
+| Name | Type | Default | Description |
+| ---- | ---- | ------- | ----------- |
+| `lang` | `string` | `en` | Response language |
+| `user_api_hash` | `string` | – | Your personal API key (hash) |
+
+### Poll-control
+
+| Name | Type | Default | Description |
+| ---- | ---- | ------- | ----------- |
+| `time` | `string (UNIX timestamp)` | *Now – 5 s* | Only return devices updated **after** this timestamp. |
+
+### Filters (`filters[...]`)
+
+All filters are **optional**; omit any you don’t need.  
+Use the `filters[...]` bracket notation exactly as shown.
+
+| Filter | Type | Description |
+| ------ | ---- | ----------- |
+| `filters[device_model]` | `string` | Exact device model |
+| `filters[group_id]` | `integer` | Exact group ID |
+| `filters[id]` | `integer` | Exact internal device ID |
+| `filters[imei]` | `string` | Exact IMEI |
+| `filters[msisdn]` | `string` | Exact MSISDN |
+| `filters[object_owner]` | `string` | Exact owner |
+| `filters[offline]` | `string` | Devices **offline** for ≥ *N* minutes |
+| `filters[online]` | `string` | Devices **online** for ≥ *N* minutes |
+| `filters[plate_number]` | `string` | Exact license-plate |
+| `filters[registration_number]` | `string` | Exact registration number |
+| `filters[sim_number]` | `string` | Exact SIM number |
+| `filters[status]` | `array[string]` (CSV) | One or more status values |
+| `filters[vin]` | `string` | Exact VIN |
 
 ---
 
 ## Successful Response `200 OK`
 
 ```jsonc
-[
-  {
-    "title": "Ungrouped",
-    "items": [
-      {
-        "id": 3,
-        "name": "Device name",
-        "online": "offline",
-        "alarm": "",
-        "time": "2016-04-29 21:01:26",
-        "timestamp": 1461956486,
-        "acktimestamp": 0,
-        "speed": 0,
-        "lat": 55.922996,
-        "lng": 23.3466906,
-        "course": "0",
-        "power": "-",
-        "altitude": 175,
-        "address": "-",
-        "protocol": "osmand",
-        "driver": "Drive first",
-        "sensors": [
-          { "name": "Sensor test", "value": "- nn", "show_in_popup": "0" },
-          { "name": "test acc", "value": "- nn", "show_in_popup": "1" }
-        ],
-        "services": [
-          { "name": "Test service", "value": "Engine hours Left (1000 )" }
-        ],
-        "tail": [
-          { "lat": "55.91986482", "lng": "23.3255625" },
-          { "lat": "55.91590619", "lng": "23.33778733" },
-          { "lat": "55.91928624", "lng": "23.34572509" },
-          { "lat": "55.92336524", "lng": "23.34666575" },
-          { "lat": "55.92297793", "lng": "23.34665713" }
-        ],
-        "distance_unit_hour": "kph",
-        "sim_expiration_date": "0000-00-00",
-        "device_data": {
-          "id": "3",
-          "traccar_device_id": "3",
-          "icon_id": "8",
-          "active": "1",
-          "deleted": "0",
-          "name": "Device name",
-          "imei": "789832",
-          "fuel_measurement_id": "1",
-          "fuel_quantity": "0.00",
-          "fuel_price": "0.00",
-          "fuel_per_km": "0.00",
-          "sim_number": "",
-          "device_model": "",
-          "plate_number": "",
-          "vin": "",
-          "registration_number": "",
-          "object_owner": "",
-          "expiration_date": "0000-00-00",
-          "sim_expiration_date": "0000-00-00",
-          "tail_color": "#33cc33",
-          "tail_length": "5",
-          "engine_hours": "gps",
-          "detect_engine": "gps",
-          "min_moving_speed": "6",
-          "min_fuel_fillings": "10",
-          "min_fuel_thefts": "10",
-          "snap_to_road": "0",
-          "created_at": "2016-04-25 16:21:19",
-          "updated_at": "2016-06-26 15:52:46",
-          "pivot": {
-            "user_id": "2",
-            "device_id": "3",
-            "group_id": null,
-            "current_driver_id": "1",
-            "active": "1",
-            "timezone_id": null
-          },
-          "group_id": null,
-          "current_driver_id": "1"
-        }
-      }
-    ]
+{
+  "items": [
+    {
+      "id": 3,
+      "name": "Device name",
+      "online": "offline",
+      "alarm": "",
+      "time": "2016-04-29 21:01:26",
+      "timestamp": 1461956486,
+      "acktimestamp": 0,
+      "speed": 0,
+      "lat": 55.922996,
+      "lng": 23.3466906,
+      "course": "0",
+      "power": "-",
+      "altitude": 175,
+      "address": "-",
+      "protocol": "osmand",
+      "driver": "Drive first",
+      "sensors": "[… JSON string …]",
+      "services": "[…]",
+      "tail": "[…]",
+      "distance_unit_hour": "kph",
+      "device_data": { /* see previous endpoint for full schema */ }
+    }
+  ],
+  "events": [],
+  "time": 1466992735,
+  "version": "2.5.1"
+}
+```
+
+### Notable Top-Level Fields
+
+| Field | Type | Meaning |
+| ----- | ---- | ------- |
+| `items` | `array<object>` | List of devices whose data changed |
+| `events` | `array<object>` | Optional list of triggered events |
+| `time` | `integer` | Seconds to wait **before next poll** |
+| `version` | `string` | API version of server |
+
+Device objects have the **same structure** as in `/get_devices`; see that endpoint for a detailed field reference.
+
+---
+
+## Error Responses
+
+| Code | Meaning | Payload |
+| ---- | ------- | ------- |
+| **400** | Bad request / wrong params | `{"error":"invalid_parameters"}` |
+| **401** | Authentication failed | `{"error":"unauthorized"}` |
+| **500** | Server error | `{"error":"server_error"}` |
+
+---
+
+## Example Request (JavaScript `fetch`)
+
+```js
+const url =
+  'https://gps.rastreovial.com/get_devices_latest' +
+  '?lang=en' +
+  '&user_api_hash=$2y$10$5RACGMNxUdz3h1ug9yAttu95U2acugM0YG1K5wx01ZrNMvpL6BWMS' +
+  '&time=' + Math.floor(Date.now() / 1000 - 5);      // now minus 5 s
+
+const options = { method: 'GET', headers: { Accept: 'application/json' } };
+
+(async () => {
+  try {
+    const res = await fetch(url, options);
+    const data = await res.json();
+    console.log(data);
+    // Next poll: wait data.time seconds
+  } catch (err) {
+    console.error(err);
   }
-]
+})();
+```
+
+
+---
+
+> © 2025 Rastreo Vial – All rights reserved.
