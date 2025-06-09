@@ -1,9 +1,10 @@
+
 # Rastreo Vial API – **GET `/get_devices`**
 
 Retrieve a paginated list of devices that belong to the authenticated user.  
 Use the filters below to narrow the results by status, identifiers, group, model, etc.
 
-> **Base URL**   
+> **Base URL**  
 > `https://gps.rastreovial.com`
 
 | Method | Endpoint |
@@ -27,12 +28,12 @@ Use the filters below to narrow the results by status, identifiers, group, model
 | `object_owner` | `string` | No | – | Exact object owner |
 | `offline` | `string` | No | – | Devices **offline** for at least *N* minutes |
 | `online` | `string` | No | – | Devices **online** for at least *N* minutes |
-| `page` | `integer` | No | `1` | Page number (1-based) |
-| `plate_number` | `string` | No | – | Exact license-plate value |
+| `page` | `integer` | No | `1` | Page number (1‑based) |
+| `plate_number` | `string` | No | – | Exact license‑plate value |
 | `registration_number` | `string` | No | – | Exact registration number |
-| `s` | `string` | No | – | Full-text search across properties |
+| `s` | `string` | No | – | Full‑text search across properties |
 | `sim_number` | `string` | No | – | Exact SIM number |
-| `status` | `array[string]` (CSV) | No | – | One or more status values (comma separated) |
+| `status` | `array[string]` (CSV) | No | – | One or more status values |
 | `vin` | `string` | No | – | Exact VIN |
 
 ---
@@ -122,3 +123,66 @@ Use the filters below to narrow the results by status, identifiers, group, model
     ]
   }
 ]
+```
+
+### Response Field Reference (per device)
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | `integer` | Internal device ID |
+| `name` | `string` | Display name |
+| `online` | `string` | `online` / `offline` |
+| `alarm` | `string` | Active alarm code (if any) |
+| `time` | `string` | Last position time (YYYY-MM-DD HH:MM:SS) |
+| `timestamp` | `integer` | Unix timestamp of `time` |
+| `speed` | `integer` | Current speed |
+| `lat`, `lng` | `number` | Latitude / Longitude |
+| `course` | `string` | Heading (°) |
+| `power` | `string` | External power or battery level |
+| `altitude` | `integer` | Elevation |
+| `address` | `string` | Reverse‑geocoded address |
+| `protocol` | `string` | Tracker protocol |
+| `driver` | `string` | Current driver’s name |
+| `sensors` | `array<object>` | Custom sensor list |
+| `services` | `array<object>` | Service reminders |
+| `tail` | `array<object>` | Recent path points |
+| `distance_unit_hour` | `string` | Speed unit (`kph` / `mph`) |
+| `…` | `…` | (See sample above for full set) |
+
+---
+
+## Error Responses
+
+| Code | Meaning | Payload |
+| ---- | ------- | ------- |
+| **400** | Bad request / wrong params | `{"error": "invalid_parameters"}` |
+| **401** | Authentication failed | `{"error": "unauthorized"}` |
+| **500** | Server error | `{"error": "server_error"}` |
+
+---
+
+## Example Request (JavaScript `fetch`)
+
+```js
+const url =
+  'https://gps.rastreovial.com/get_devices' +
+  '?lang=en' +
+  '&user_api_hash=$2y$10$5RACGMNxUdz3h1ug9yAttu95U2acugM0YG1K5wx01ZrNMvpL6BWMS' +
+  '&limit=50&online=5';
+
+const options = { method: 'GET', headers: { Accept: 'application/json' } };
+
+(async () => {
+  try {
+    const response = await fetch(url, options);
+    const data = await response.json();
+    console.log(data);
+  } catch (err) {
+    console.error(err);
+  }
+})();
+```
+
+---
+
+> © 2025 Rastreo Vial – All rights reserved.
