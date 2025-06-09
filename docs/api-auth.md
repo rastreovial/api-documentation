@@ -1,102 +1,82 @@
 
-# 📘 Documentación de la API de Rastreo Vial
+# Rastreo Vial API – **POST `/login`**
 
-## Endpoint: Crear un Login
+Authenticate a user and receive a `user_api_hash`.  
+Save this hash and include it in every subsequent request (e.g., `user_api_hash=<hash>`).  
+The hash **changes** if the user resets their password—at that point the API will return an authentication error and you must re‑login.
 
-Este endpoint permite autenticar a un usuario en la plataforma de Rastreo Vial y obtener un token de acceso para futuras solicitudes a la API.
+> **Base URL**  
+> `https://gps.rastreovial.com`
 
-- **URL Base**: `https://gps.rastreovial.com/api/`
-- **Endpoint**: `login`
-- **Método HTTP**: `POST`
-- **Autenticación**: No requiere token previo
+| Method | Endpoint |
+| ------ | -------- |
+| `POST` | `/login` |
 
 ---
 
-## 🔐 Parámetros de la Solicitud
+## Request
 
-La solicitud debe enviarse en formato JSON con los siguientes campos:
+**Content‑Type:** `multipart/form-data`
 
-| Parámetro | Tipo   | Requerido | Descripción                         |
-|-----------|--------|-----------|-------------------------------------|
-| `email`   | string | Sí        | Correo electrónico del usuario      |
-| `password`| string | Sí        | Contraseña del usuario              |
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `email` | `string` | **Yes** | User’s email address |
+| `password` | `string` | **Yes** | User’s password |
+| `as` | `string` | No | *Optional.* Log in **as another user** (provide their email). Only available to admins. |
 
-### Ejemplo de Solicitud
+---
+
+## Successful Response `200 OK`
 
 ```json
 {
-  "email": "usuario@ejemplo.com",
-  "password": "tu_contraseña_segura"
+  "status": 1,
+  "user_api_hash": "$2y$10$5RACGMNxUdz3h1ug9yAttu95U2acugM0YG1K5wx01ZrNMvpL6BWMS"
 }
+```
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `status` | `integer` | `1` on success |
+| `user_api_hash` | `string` | Token to authenticate future calls |
+
+---
+
+## Error Response `401 Unauthorized`
+
+```json
+{ "status": 0, "error": "invalid_credentials" }
 ```
 
 ---
 
-## ✅ Respuesta Exitosa
+## Example Request (JavaScript `fetch`)
 
-Si las credenciales son correctas, la API responderá con un token de autenticación y detalles del usuario.
+```js
+const url = 'https://gps.rastreovial.com/login';
 
-### Código de Estado: `200 OK`
+const form = new FormData();
+form.append('email', 'user@example.com');
+form.append('password', 'p@ssw0rd');
 
-### Cuerpo de la Respuesta
+const options = {
+  method: 'POST',
+  headers: { Accept: 'application/json' },
+  body: form
+};
 
-```json
-{
-  "status": true,
-  "data": {
-    "id": 123,
-    "email": "usuario@ejemplo.com",
-    "api_hash": "abc123def456ghi789jkl012mno345pq",
-    "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
+(async () => {
+  try {
+    const res = await fetch(url, options);
+    const data = await res.json();
+    console.log(data);           // { status: 1, user_api_hash: '...' }
+  } catch (err) {
+    console.error(err);
   }
-}
+})();
 ```
 
-### Campos de la Respuesta
-
-| Campo      | Tipo   | Descripción                                      |
-|------------|--------|--------------------------------------------------|
-| `status`   | bool   | Indica si la autenticación fue exitosa           |
-| `data.id`  | int    | ID único del usuario                             |
-| `data.email`| string| Correo electrónico del usuario                   |
-| `data.api_hash`| string| Hash único del usuario para autenticación     |
-| `data.token`| string| Token JWT para autenticación en futuras solicitudes |
 
 ---
 
-## ❌ Respuesta de Error
-
-Si las credenciales son incorrectas o falta algún parámetro, la API responderá con un mensaje de error.
-
-### Código de Estado: `401 Unauthorized` o `400 Bad Request`
-
-### Ejemplo de Respuesta de Error
-
-```json
-{
-  "status": false,
-  "message": "Credenciales inválidas."
-}
-```
-
----
-
-## 🛡️ Uso del Token de Autenticación
-
-El token recibido debe incluirse en el encabezado de las solicitudes posteriores para acceder a endpoints protegidos.
-
-### Encabezado de Autenticación
-
-```
-Authorization: Bearer {token}
-```
-
-Reemplaza `{token}` con el valor del campo `data.token` obtenido en la respuesta exitosa.
-
----
-
-## 📌 Notas Adicionales
-
-- Asegúrate de mantener tu token seguro y no compartirlo públicamente.
-- El token tiene una duración limitada; consulta la documentación de autenticación para detalles sobre la expiración y renovación del token.
-- En caso de múltiples intentos fallidos de inicio de sesión, la cuenta puede ser bloqueada temporalmente por razones de seguridad.
+> © 2025 Rastreo Vial – All rights reserved.
