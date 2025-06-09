@@ -77,7 +77,7 @@ Use the `filters[...]` bracket notation exactly as shown.
       "services": "[…]",
       "tail": "[…]",
       "distance_unit_hour": "kph",
-      "device_data": { /* see previous endpoint for full schema */ }
+      "device_data": { /* see get_devices endpoint for full schema */ }
     }
   ],
   "events": [],
